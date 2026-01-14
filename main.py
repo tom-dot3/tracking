@@ -15,17 +15,22 @@ async def collect(request: Request):
     try:
         data = await request.json()
         
-        # Force print + flush để đảm bảo xuất hiện
+        # Print với flush=True để buộc gửi ngay từng dòng
         print("==== NEW VISITOR START ====", flush=True)
-        print(json.dumps(data, indent=2), flush=True)
+        
+        # In JSON từng phần để tránh gộp/cắt
+        json_str = json.dumps(data, indent=2)
+        for line in json_str.splitlines():
+            print(line, flush=True)
+        
         print("==== NEW VISITOR END ====", flush=True)
-        import sys
+        
         sys.stdout.flush()  # Double force
         
         return {"status": "ok"}
     except Exception as e:
-        print(f"ERROR OCCURRED: {str(e)}", flush=True)
+        print(f"ERROR: {str(e)}", flush=True)
         sys.stdout.flush()
         import traceback
-        traceback.print_exc(file=sys.stdout)  # In traceback đầy đủ nếu crash
-        raise  # Để Vercel capture nếu có
+        traceback.print_exc(file=sys.stdout)
+        raise
