@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Tracking Demo</title>
+</head>
+<body>
+<h3>Tracking Demo</h3>
+
+<script>
+function canvasFP() {
+    const c = document.createElement("canvas");
+    const ctx = c.getContext("2d");
+    ctx.textBaseline = "top";
+    ctx.font = "16px Arial";
+    ctx.fillText("fingerprint", 2, 2);
+    return c.toDataURL();
+}
+
+function webglFP() {
+    const c = document.createElement("canvas");
+    const gl = c.getContext("webgl");
+    if (!gl) return "no-webgl";
+    return {
+        vendor: gl.getParameter(gl.VENDOR),
+        renderer: gl.getParameter(gl.RENDERER)
+    };
+}
+
+const data = {
+    userAgent: navigator.userAgent,
+    platform: navigator.platform,
+    vendor: navigator.vendor,
+    languages: navigator.languages,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    timezoneOffset: new Date().getTimezoneOffset(),
+
+    screen: {
+        width: screen.width,
+        height: screen.height,
+        availWidth: screen.availWidth,
+        availHeight: screen.availHeight,
+        colorDepth: screen.colorDepth,
+        pixelRatio: window.devicePixelRatio
+    },
+
+    hardware: {
+        cores: navigator.hardwareConcurrency,
+        memory: navigator.deviceMemory || "unknown",
+        touchSupport: navigator.maxTouchPoints
+    },
+
+    storage: {
+        cookies: navigator.cookieEnabled,
+        localStorage: !!window.localStorage,
+        sessionStorage: !!window.sessionStorage
+    },
+
+    privacy: {
+        doNotTrack: navigator.doNotTrack
+    },
+
+    network: {
+        online: navigator.onLine
+    },
+
+    fingerprint: {
+        canvas: canvasFP(),
+        webgl: webglFP()
+    }
+};
+
+fetch("/collect", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(data)
+});
+</script>
+
+</body>
+</html>
