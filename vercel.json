@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "main.py",  // Thay nếu file tên server.py hoặc api/main.py
-      "use": "@vercel/python",
-      "config": { "runtime": "python3.12" }  // Hoặc python3.11 nếu bạn dùng cũ hơn
+      "src": "main.py",  // thay nếu file tên server.py hoặc api/main.py
+      "use": "@vercel/python"
     }
   ],
   "routes": [
-    { "src": "/collect", "dest": "main.py" },
-    { "src": "/test-log", "dest": "main.py" },
-    { "src": "/(.*)", "dest": "main.py" }
+    {
+      "src": "/(.*)",
+      "dest": "main.py"
+    }
   ]
 }
