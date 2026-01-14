@@ -12,10 +12,20 @@ async def index():
 
 @app.post("/collect")
 async def collect(request: Request):
-    data = await request.json()
-
-    print("==== NEW VISITOR ====")
-    print(json.dumps(data, indent=2))
-    print("=====================")
-
-    return {"status": "ok"}
+    try:
+        data = await request.json()
+        
+        # Force print + flush để đảm bảo xuất hiện
+        print("==== NEW VISITOR START ====", flush=True)
+        print(json.dumps(data, indent=2), flush=True)
+        print("==== NEW VISITOR END ====", flush=True)
+        import sys
+        sys.stdout.flush()  # Double force
+        
+        return {"status": "ok"}
+    except Exception as e:
+        print(f"ERROR OCCURRED: {str(e)}", flush=True)
+        sys.stdout.flush()
+        import traceback
+        traceback.print_exc(file=sys.stdout)  # In traceback đầy đủ nếu crash
+        raise  # Để Vercel capture nếu có
