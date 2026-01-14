@@ -18,13 +18,9 @@ async def collect(request: Request):
         print("==== NEW VISITOR START ====", flush=True)
         print(json.dumps(data, indent=2), flush=True)
         print("==== NEW VISITOR END ====", flush=True)
-        sys.stdout.flush()  # Force gửi logs
+        sys.stdout.flush()  # Force gửi log ngay lập tức
         return {"status": "ok"}
     except Exception as e:
         print(f"ERROR in /collect: {str(e)}", flush=True)
-        raise  # Để thấy traceback nếu crash
-
-@app.get("/test-log")  # Test đơn giản
-async def test_log():
-    print("TEST PRINT - SHOULD SHOW IN LOGS NOW!", flush=True)
-    return {"test": "log ok"}
+        sys.stdout.flush()
+        raise  # Để Vercel capture traceback nếu crash
