@@ -1,17 +1,29 @@
 import json
 from fastapi import FastAPI, Request
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
+import os
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
+# Route cho trang chủ - đọc file từ public/
 @app.get("/", response_class=HTMLResponse)
 async def index():
-    with open("static/index.html", encoding="utf-8") as f:
+    file_path = os.path.join("public", "index.html")  # hoặc "static/index.html" nếu bạn giữ tên static
+    if not os.path.exists(file_path):
+        return HTMLResponse(content="<h1>index.html not found in public/</h1>", status_code=404)
+    
+    with open(file_path, encoding="utf-8") as f:
         return f.read()
 
+# (Tùy chọn) Nếu cần serve các file tĩnh khác (css, js, images...) thủ công
+@app.get("/static/{path:path}")
+async def static_files(path: str):
+    file_path = os.path.join("public", path)  # hoặc "static", tùy bạn
+    if not os.path.exists(file_path):
+        return FileResponse(status_code=404)
+    return FileResponse(file_path)
+
+# Endpoint collect giữ nguyên
 @app.post("/collect")
 async def collect(request: Request):
     data = await request.json()
