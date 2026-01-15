@@ -5,19 +5,17 @@ from pathlib import Path
 
 app = FastAPI()
 
-# Tắt mount StaticFiles vì không ổn định trên Vercel → dùng FileResponse thủ công
-STATIC_DIR = Path("static")
+STATIC_DIR = Path("static")  # Đảm bảo folder static được commit & bundle
 
 @app.get("/", response_class=HTMLResponse)
 async def index():
     index_path = STATIC_DIR / "index.html"
     if not index_path.exists():
-        return HTMLResponse("<h1>index.html not found</h1>", status_code=404)
+        return HTMLResponse(content="<h1>index.html not found in static/</h1>", status_code=404)
     return index_path.read_text(encoding="utf-8")
 
-# Serve static files (css, js, images...) thủ công
 @app.get("/static/{path:path}")
-async def static_files(path: str):
+async def serve_static(path: str):
     file_path = STATIC_DIR / path
     if not file_path.exists() or not file_path.is_file():
         return FileResponse(status_code=404)
@@ -32,8 +30,3 @@ async def collect(request: Request):
     print("=====================")
 
     return {"status": "ok"}
-
-# (Tùy chọn) Catch-all fallback cho các path khác (nếu cần)
-@app.get("/{path:path}")
-async def fallback(path: str):
-    return HTMLResponse("<h1>404 - Not Found</h1>", status_code=404)
